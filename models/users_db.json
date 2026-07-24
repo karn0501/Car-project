@@ -40,5 +40,19 @@
     "password_hash": "3167838a622898386893a8449059e86b196c3bb414cfa69e586a8d0ce637b847",
     "created_at": "2026-07-24T22:04:30.749275",
     "valuations": []
+  },
+  "testuser_638ed085@example.com": {
+    "email": "testuser_638ed085@example.com",
+    "full_name": "Test User",
+    "password_hash": "3167838a622898386893a8449059e86b196c3bb414cfa69e586a8d0ce637b847",
+    "created_at": "2026-07-24T22:08:57.234476",
+    "valuations": []
+  },
+  "testuser_122e590c@example.com": {
+    "email": "testuser_122e590c@example.com",
+    "full_name": "Test User",
+    "password_hash": "3167838a622898386893a8449059e86b196c3bb414cfa69e586a8d0ce637b847",
+    "created_at": "2026-07-24T22:12:18.632540",
+    "valuations": []
   }
 }

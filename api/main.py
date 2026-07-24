@@ -189,6 +189,50 @@ currency_converter = CurrencyConverter()
 regional_tax_calculator = RegionalTaxCalculator()
 translation_engine = TranslationEngine()
 
+from src.fraud_detector import ListingFraudDetector
+from src.vin_decoder import VINDecoder
+from src.dealer_analytics import DealerAnalyticsEngine
+
+fraud_detector = ListingFraudDetector()
+vin_decoder = VINDecoder()
+dealer_analytics_engine = DealerAnalyticsEngine()
+
+
+@app.post("/fraud/evaluate", tags=["Fraud & Anomaly Security"])
+async def evaluate_fraud(car_data: dict, _=Depends(verify_api_key)):
+    """
+    Evaluates a vehicle listing for fraud indicators and odometer tampering.
+    Returns Fraud Risk Score (0.00-1.00), Risk Level, and anomaly flags.
+    """
+    pred_res = prediction_service.predict(car_data)
+    report = fraud_detector.evaluate_listing_fraud(car_data, pred_res["predicted_price"])
+    return report
+
+
+@app.get("/vin/decode/{vin}", tags=["Vehicle Identification"])
+async def decode_vin_number(vin: str):
+    """
+    Decodes 17-character ISO 3779 VIN / Chassis string to extract vehicle specs.
+    """
+    res = vin_decoder.decode_vin(vin)
+    if not res.get("valid"):
+        raise HTTPException(status_code=400, detail=res.get("reason", "Invalid VIN"))
+    return res
+
+
+@app.post("/dealer/analytics", tags=["Dealer Intelligence"])
+async def calculate_dealer_analytics(car_data: dict, _=Depends(verify_api_key)):
+    """
+    Generates Trade-In (Wholesale), Private Party, and Retail Showroom margins,
+    plus 1-year, 3-year, and 5-year future depreciation projections.
+    """
+    pred_res = prediction_service.predict(car_data)
+    analytics = dealer_analytics_engine.generate_dealer_analytics(
+        fair_market_price=pred_res["predicted_price"],
+        manufacture_year=car_data.get("manufacture_year", 2020)
+    )
+    return analytics
+
 
 @app.get("/currencies", tags=["Multi-Region Localization"])
 async def get_supported_currencies():
