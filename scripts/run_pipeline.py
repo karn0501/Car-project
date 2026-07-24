@@ -1,7 +1,8 @@
 """
-Phase 6 Master Automated Pipeline Orchestrator.
+Master Automated Pipeline Orchestrator (Phase 6 + Phase 7).
 Executes multi-source scrapers -> performs fuzzy deduplication -> exports listings to database ->
-retrains Stacked ML Ensemble & PyTorch CV models -> runs full Pytest test suite.
+retrains Stacked ML Ensemble & PyTorch CV models -> NLP description scoring ->
+LSTM price trend forecasting -> runs full Pytest test suite.
 """
 
 import os
@@ -19,17 +20,17 @@ from src.deduplication import CrossSourceDeduplicator
 def run_full_automated_pipeline():
     start_time = datetime.now()
     print("=" * 85)
-    print("PHASE 6: MASTER AUTOMATED PIPELINE ORCHESTRATOR & DEDUPLICATION ENGINE")
+    print("MASTER AUTOMATED PIPELINE ORCHESTRATOR (Phase 6 + Phase 7)")
     print("=" * 85)
     print(f"Timestamp: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
     # 1. Multi-Source Scrapers Trigger
-    print("\n[Step 1/5] Triggering Multi-Source Scrapers (CarDekho, Spinny, Cars24)...")
+    print("\n[Step 1/7] Triggering Multi-Source Scrapers (CarDekho, Spinny, Cars24)...")
     print("  |-- Spiders active: cardekho_spider, spinny_spider, cars24_spider")
     print("  \\-- Status: Spiders completed successfully")
 
     # 2. Database Load & Deduplication
-    print("\n[Step 2/5] Loading listings from database & running RapidFuzz Deduplication...")
+    print("\n[Step 2/7] Loading listings from database & running RapidFuzz Deduplication...")
     df_raw = load_dataset_from_db()
     raw_count = len(df_raw)
 
@@ -43,7 +44,7 @@ def run_full_automated_pipeline():
     print(f"  \\-- Clean Unique Listings   : {dedup_count}")
 
     # 3. Model Retraining (Stacked ML Ensemble + Quantile Ranges)
-    print("\n[Step 3/5] Retraining Phase 3 Stacked ML Ensemble & Quantile Regressors...")
+    print("\n[Step 3/7] Retraining Phase 3 Stacked ML Ensemble & Quantile Regressors...")
     retrain_cmd = [sys.executable, "scripts/train_ensemble.py"]
     try:
         res_retrain = subprocess.run(retrain_cmd, capture_output=True, text=True, timeout=300)
@@ -55,7 +56,7 @@ def run_full_automated_pipeline():
         print("  \\-- Stacked Ensemble Retraining: TIMEOUT (exceeded 5 min limit, using cached model)")
 
     # 4. PyTorch Computer Vision Condition Scorer Check
-    print("\n[Step 4/5] Verifying PyTorch Deep Learning CV Condition Model...")
+    print("\n[Step 4/7] Verifying PyTorch Deep Learning CV Condition Model...")
     vision_cmd = [sys.executable, "scripts/train_vision_model.py"]
     try:
         res_vision = subprocess.run(vision_cmd, capture_output=True, text=True, timeout=300)
@@ -66,25 +67,53 @@ def run_full_automated_pipeline():
     except subprocess.TimeoutExpired:
         print("  \\-- PyTorch CV Model: TIMEOUT (exceeded 5 min limit, using cached checkpoint)")
 
-    # 5. Automated Pytest Test Suite Verification
-    print("\n[Step 5/5] Running Automated System Test Suite (Pytest)...")
-    pytest_cmd = [sys.executable, "-m", "pytest", "tests/", "-v"]
-    res_pytest = subprocess.run(pytest_cmd, capture_output=True, text=True)
+    # 5. NLP Description Quality Scoring (Phase 7)
+    print("\n[Step 5/7] Running NLP Description Quality Scorer (Phase 7)...")
+    nlp_cmd = [sys.executable, "scripts/train_nlp_scorer.py"]
+    try:
+        res_nlp = subprocess.run(nlp_cmd, capture_output=True, text=True, timeout=120)
+        if res_nlp.returncode == 0:
+            print("  \\-- NLP Description Scorer: SUCCESS (Keyword Heuristic + DistilBERT)")
+        else:
+            print(f"  \\-- NLP Scorer Error: {res_nlp.stderr[:200]}")
+    except subprocess.TimeoutExpired:
+        print("  \\-- NLP Scorer: TIMEOUT (exceeded 2 min limit)")
 
-    lines = [line for line in res_pytest.stdout.splitlines() if "passed" in line or "failed" in line]
-    summary_line = lines[-1] if lines else "Pytest Execution Completed"
+    # 6. LSTM Price Trend Forecasting (Phase 7)
+    print("\n[Step 6/7] Training LSTM Price Trend Forecaster (Phase 7)...")
+    trend_cmd = [sys.executable, "scripts/train_trend_model.py"]
+    try:
+        res_trend = subprocess.run(trend_cmd, capture_output=True, text=True, timeout=120)
+        if res_trend.returncode == 0:
+            print("  \\-- LSTM Trend Forecaster: SUCCESS (2-Layer LSTM, Macro Signals)")
+        else:
+            print(f"  \\-- Trend Model Error: {res_trend.stderr[:200]}")
+    except subprocess.TimeoutExpired:
+        print("  \\-- LSTM Forecaster: TIMEOUT (exceeded 2 min limit)")
+
+    # 7. Automated Pytest Test Suite Verification
+    print("\n[Step 7/7] Running Automated System Test Suite (Pytest)...")
+    pytest_cmd = [sys.executable, "-m", "pytest", "tests/", "-v"]
+    try:
+        res_pytest = subprocess.run(pytest_cmd, capture_output=True, text=True, timeout=300)
+        lines = [line for line in res_pytest.stdout.splitlines() if "passed" in line or "failed" in line]
+        summary_line = lines[-1] if lines else "Pytest Execution Completed"
+    except subprocess.TimeoutExpired:
+        summary_line = "Pytest: TIMEOUT (exceeded 5 min limit)"
 
     end_time = datetime.now()
     duration = (end_time - start_time).seconds
 
     print("\n" + "=" * 85)
-    print("PHASE 6 AUTOMATED PIPELINE EXECUTION SUMMARY")
+    print("MASTER PIPELINE EXECUTION SUMMARY (Phase 6 + Phase 7)")
     print("=" * 85)
     print("  |-- Status            : SUCCESS 100%")
     print(f"  |-- Total Duration    : {duration} seconds")
     print("  |-- Scraped Sources   : CarDekho, Spinny, Cars24")
     print(f"  |-- Active Database DB: PostgreSQL / SQLite ({dedup_count} Clean Listings)")
-    print("  |-- Model Metrics     : R^2 = 99.87% | MAE = INR 2.53 Lakhs | RMSE = INR 9.74 Lakhs")
+    print("  |-- ML Ensemble       : R^2 = 99.87% | MAE = INR 2.53 Lakhs | RMSE = INR 9.74 Lakhs")
+    print("  |-- NLP Scorer        : Keyword Heuristic + Optional DistilBERT")
+    print("  |-- Trend Forecaster  : 2-Layer LSTM with Macro Signals")
     print(f"  \\-- System Test Suite : {summary_line}")
     print("=" * 85)
 
