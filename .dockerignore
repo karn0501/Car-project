@@ -1,0 +1,13 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+.pytest_cache
+catboost_info
+*.egg-info
+.env
+.venv
+venv
+node_modules
+*.db
+*.sql

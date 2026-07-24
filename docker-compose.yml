@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  backend:
+    build: .
+    container_name: car-prediction-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:CarPassword123!@db:5432/car_prediction_db
+      - CAR_API_KEY=car-prediction-api-key-2026
+    volumes:
+      - ./models:/app/models
+      - ./car_prediction.db:/app/car_prediction.db
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    container_name: car-prediction-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: CarPassword123!
+      POSTGRES_DB: car_prediction_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
