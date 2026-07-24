@@ -15,6 +15,138 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // 1b. Dynamic Cascading Brand -> Model -> Variant Dropdowns
+    const companySelect = document.getElementById("company_name");
+    const modelSelect = document.getElementById("model_name");
+    const variantSelect = document.getElementById("variant_name");
+
+    let vehicleHierarchy = {
+        "Maruti": {
+            "Swift": ["VXi", "LXi", "ZXi", "ZXi Plus", "VDi", "ZDi"],
+            "Baleno": ["Delta", "Sigma", "Zeta", "Alpha"],
+            "Alto 800": ["LXi", "Std", "VXi"],
+            "Dzire": ["VXi", "LXi", "ZXi", "ZXi Plus"],
+            "Ertiga": ["VXi", "LXi", "ZXi", "ZXi Plus"],
+            "Brezza": ["VXi", "LXi", "ZXi", "ZXi Plus"],
+            "Wagon R": ["VXi", "LXi", "ZXi"]
+        },
+        "Hyundai": {
+            "Creta": ["SX", "E", "EX", "S", "SX(O)"],
+            "i20": ["Sportz", "Magna", "Asta", "Asta(O)"],
+            "Verna": ["SX", "EX", "SX(O)"],
+            "Venue": ["S", "E", "SX", "SX(O)"],
+            "Grand i10": ["Sportz", "Era", "Magna", "Asta"]
+        },
+        "Tata": {
+            "Nexon": ["XZ", "XE", "XM", "XZ+", "XZ+(O)"],
+            "Harrier": ["XT", "XE", "XM", "XZ", "XZ+"],
+            "Punch": ["Adventure", "Pure", "Accomplished", "Creative"],
+            "Tiago": ["XT", "XE", "XM", "XZ", "XZ+"],
+            "Safari": ["XT", "XE", "XM", "XZ", "XZ+"]
+        },
+        "Mahindra": {
+            "Thar": ["LX", "AX", "AX(O)"],
+            "Scorpio-N": ["Z4", "Z2", "Z6", "Z8", "Z8L"],
+            "XUV700": ["AX5", "MX", "AX3", "AX7", "AX7L"],
+            "Bolero": ["B6", "B4", "B6(O)"],
+            "XUV300": ["W6", "W4", "W8", "W8(O)"]
+        },
+        "Honda": {
+            "City": ["VX", "SV", "V", "ZX"],
+            "Amaze": ["S", "E", "V", "VX"],
+            "Civic": ["VX", "V", "ZX"],
+            "WR-V": ["VX", "SV"]
+        },
+        "Toyota": {
+            "Innova Crysta": ["VX", "GX", "ZX"],
+            "Fortuner": ["4x2", "4x4", "Legender"],
+            "Glanza": ["G", "E", "S", "V"]
+        },
+        "Kia": {
+            "Seltos": ["HTX", "HTE", "HTK", "GTX", "X-Line"],
+            "Sonet": ["HTX", "HTE", "HTK", "GTX+"],
+            "Carens": ["Prestige", "Premium", "Luxury", "Luxury Plus"]
+        },
+        "Volkswagen": {
+            "Polo": ["Highline", "Trendline", "Comfortline", "GT TSI"],
+            "Vento": ["Highline", "Trendline", "Comfortline", "Highline Plus"],
+            "Virtus": ["Dynamic Line", "Performance Line", "GT"],
+            "Taigun": ["Highline", "Comfortline", "Topline", "GT"]
+        }
+    };
+
+    async function initHierarchy() {
+        try {
+            const res = await fetch("/hierarchy");
+            if (res.ok) {
+                const data = await res.json();
+                if (data && Object.keys(data).length > 0) {
+                    vehicleHierarchy = data;
+                }
+            }
+        } catch (e) {}
+
+        populateCompanyDropdown();
+    }
+
+    function populateCompanyDropdown() {
+        if (!companySelect) return;
+        companySelect.innerHTML = "";
+        Object.keys(vehicleHierarchy).forEach(brand => {
+            const opt = document.createElement("option");
+            opt.value = brand;
+            opt.innerText = brand;
+            companySelect.appendChild(opt);
+        });
+
+        companySelect.value = "Maruti";
+        updateModelDropdown();
+    }
+
+    function updateModelDropdown() {
+        if (!companySelect || !modelSelect) return;
+        const brand = companySelect.value;
+        const modelsObj = vehicleHierarchy[brand] || {};
+
+        modelSelect.innerHTML = "";
+        Object.keys(modelsObj).forEach(m => {
+            const opt = document.createElement("option");
+            opt.value = m;
+            opt.innerText = m;
+            modelSelect.appendChild(opt);
+        });
+
+        if (modelSelect.options.length > 0) {
+            modelSelect.selectedIndex = 0;
+        }
+        updateVariantDropdown();
+    }
+
+    function updateVariantDropdown() {
+        if (!companySelect || !modelSelect || !variantSelect) return;
+        const brand = companySelect.value;
+        const model = modelSelect.value;
+        const variants = (vehicleHierarchy[brand] && vehicleHierarchy[brand][model]) || ["Base"];
+
+        variantSelect.innerHTML = "";
+        variants.forEach(v => {
+            const opt = document.createElement("option");
+            opt.value = v;
+            opt.innerText = v;
+            variantSelect.appendChild(opt);
+        });
+
+        if (variantSelect.options.length > 0) {
+            variantSelect.selectedIndex = 0;
+        }
+    }
+
+    if (companySelect && modelSelect && variantSelect) {
+        companySelect.addEventListener("change", updateModelDropdown);
+        modelSelect.addEventListener("change", updateVariantDropdown);
+        initHierarchy();
+    }
+
     // 2. Tab Navigation System
     const navLinks = document.querySelectorAll(".nav-link");
     const tabPanes = document.querySelectorAll(".tab-pane");

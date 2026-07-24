@@ -199,6 +199,89 @@ async def check_data_drift():
         raise HTTPException(status_code=500, detail=f"Drift check failed: {str(e)}")
 
 
+@app.get("/hierarchy", tags=["Vehicle Metadata"])
+async def get_vehicle_hierarchy():
+    """
+    Returns brand -> model -> variant dynamic hierarchy mapping for UI dropdown cascading.
+    """
+    default_hierarchy = {
+        "Maruti": {
+            "Swift": ["VXi", "LXi", "ZXi", "ZXi Plus", "VDi", "ZDi"],
+            "Baleno": ["Delta", "Sigma", "Zeta", "Alpha"],
+            "Alto 800": ["LXi", "Std", "VXi"],
+            "Dzire": ["VXi", "LXi", "ZXi", "ZXi Plus"],
+            "Ertiga": ["VXi", "LXi", "ZXi", "ZXi Plus"],
+            "Brezza": ["VXi", "LXi", "ZXi", "ZXi Plus"],
+            "Wagon R": ["VXi", "LXi", "ZXi"]
+        },
+        "Hyundai": {
+            "Creta": ["SX", "E", "EX", "S", "SX(O)"],
+            "i20": ["Sportz", "Magna", "Asta", "Asta(O)"],
+            "Verna": ["SX", "EX", "SX(O)"],
+            "Venue": ["S", "E", "SX", "SX(O)"],
+            "Grand i10": ["Sportz", "Era", "Magna", "Asta"]
+        },
+        "Tata": {
+            "Nexon": ["XZ", "XE", "XM", "XZ+", "XZ+(O)"],
+            "Harrier": ["XT", "XE", "XM", "XZ", "XZ+"],
+            "Punch": ["Adventure", "Pure", "Accomplished", "Creative"],
+            "Tiago": ["XT", "XE", "XM", "XZ", "XZ+"],
+            "Safari": ["XT", "XE", "XM", "XZ", "XZ+"]
+        },
+        "Mahindra": {
+            "Thar": ["LX", "AX", "AX(O)"],
+            "Scorpio-N": ["Z4", "Z2", "Z6", "Z8", "Z8L"],
+            "XUV700": ["AX5", "MX", "AX3", "AX7", "AX7L"],
+            "Bolero": ["B6", "B4", "B6(O)"],
+            "XUV300": ["W6", "W4", "W8", "W8(O)"]
+        },
+        "Honda": {
+            "City": ["VX", "SV", "V", "ZX"],
+            "Amaze": ["S", "E", "V", "VX"],
+            "Civic": ["VX", "V", "ZX"],
+            "WR-V": ["VX", "SV"]
+        },
+        "Toyota": {
+            "Innova Crysta": ["VX", "GX", "ZX"],
+            "Fortuner": ["4x2", "4x4", "Legender"],
+            "Glanza": ["G", "E", "S", "V"]
+        },
+        "Kia": {
+            "Seltos": ["HTX", "HTE", "HTK", "GTX", "X-Line"],
+            "Sonet": ["HTX", "HTE", "HTK", "GTX+"],
+            "Carens": ["Prestige", "Premium", "Luxury", "Luxury Plus"]
+        },
+        "Volkswagen": {
+            "Polo": ["Highline", "Trendline", "Comfortline", "GT TSI"],
+            "Vento": ["Highline", "Trendline", "Comfortline", "Highline Plus"],
+            "Virtus": ["Dynamic Line", "Performance Line", "GT"],
+            "Taigun": ["Highline", "Comfortline", "Topline", "GT"]
+        }
+    }
+
+    try:
+        from db.database import SessionLocal
+        from db.models import Company, Model, Variant
+        db = SessionLocal()
+        companies = db.query(Company).all()
+        if companies:
+            db_hierarchy = {}
+            for comp in companies:
+                models_dict = {}
+                for m in comp.models:
+                    variants = [v.name for v in m.variants] if m.variants else ["Base"]
+                    models_dict[m.name] = list(set(variants))
+                if models_dict:
+                    db_hierarchy[comp.name] = models_dict
+            db.close()
+            if db_hierarchy:
+                return db_hierarchy
+    except Exception:
+        pass
+
+    return default_hierarchy
+
+
 from src.currency_engine import CurrencyConverter
 from src.regional_tax import RegionalTaxCalculator
 from src.i18n import TranslationEngine
