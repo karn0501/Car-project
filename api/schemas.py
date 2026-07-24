@@ -3,7 +3,7 @@ Phase 8: Pydantic Request/Response Schemas for FastAPI endpoints.
 Defines strict, validated data models for all API interactions.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict
 from datetime import datetime
 
@@ -28,8 +28,8 @@ class PredictRequest(BaseModel):
     accident_history: str = Field(default="No", description="Accident history")
     description: Optional[str] = Field(default=None, description="Listing description text for NLP scoring")
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "company_name": "Maruti",
                 "model_name": "Swift",
@@ -47,6 +47,7 @@ class PredictRequest(BaseModel):
                 "accident_history": "No",
             }
         }
+    )
 
 
 class FeatureImpact(BaseModel):

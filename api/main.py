@@ -47,6 +47,23 @@ from api.auth import router as auth_router
 from api.nlp_query_parser import CarQueryParser
 
 
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Log startup status."""
+    print("=" * 70)
+    print("Used Car Price Prediction API — Starting Up")
+    print("=" * 70)
+    print(f"  |-- Ensemble Model  : {'LOADED' if prediction_service.is_loaded() else 'NOT LOADED'}")
+    print(f"  |-- CNN Condition   : {'LOADED' if image_service.is_loaded() else 'NOT LOADED'}")
+    print(f"  |-- LSTM Trend      : {'LOADED' if trend_service.is_loaded() else 'NOT LOADED'}")
+    print(f"  \\-- API Docs        : http://localhost:8000/docs")
+    print("=" * 70)
+    yield
+
+
 # ─── App Configuration ────────────────────────────────────────────────────────
 
 app = FastAPI(
@@ -57,6 +74,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Include Auth Router
@@ -505,18 +523,3 @@ async def download_report(prediction_id: str, _=Depends(verify_api_key)):
         media_type=content_type,
         headers={"Content-Disposition": f"attachment; filename={filename}"},
     )
-
-
-# ─── Startup Event ────────────────────────────────────────────────────────────
-
-@app.on_event("startup")
-async def startup_event():
-    """Log startup status."""
-    print("=" * 70)
-    print("Used Car Price Prediction API — Starting Up")
-    print("=" * 70)
-    print(f"  |-- Ensemble Model  : {'LOADED' if prediction_service.is_loaded() else 'NOT LOADED'}")
-    print(f"  |-- CNN Condition   : {'LOADED' if image_service.is_loaded() else 'NOT LOADED'}")
-    print(f"  |-- LSTM Trend      : {'LOADED' if trend_service.is_loaded() else 'NOT LOADED'}")
-    print(f"  \\-- API Docs        : http://localhost:8000/docs")
-    print("=" * 70)
