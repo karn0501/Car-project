@@ -126,7 +126,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!companySelect || !modelSelect || !variantSelect) return;
         const brand = companySelect.value;
         const model = modelSelect.value;
-        const variants = (vehicleHierarchy[brand] && vehicleHierarchy[brand][model]) || ["Base"];
+        const modelObj = (vehicleHierarchy[brand] && vehicleHierarchy[brand][model]) || {};
+
+        let variants = [];
+        if (Array.isArray(modelObj)) {
+            variants = modelObj;
+        } else {
+            variants = Object.keys(modelObj);
+        }
+
+        if (!variants || variants.length === 0) variants = ["Base"];
 
         variantSelect.innerHTML = "";
         variants.forEach(v => {
@@ -139,11 +148,35 @@ document.addEventListener("DOMContentLoaded", () => {
         if (variantSelect.options.length > 0) {
             variantSelect.selectedIndex = 0;
         }
+
+        autofillVariantSpecs();
+    }
+
+    function autofillVariantSpecs() {
+        if (!companySelect || !modelSelect || !variantSelect) return;
+        const brand = companySelect.value;
+        const model = modelSelect.value;
+        const variant = variantSelect.value;
+
+        const fuelSelect = document.getElementById("fuel_type");
+        const transSelect = document.getElementById("transmission");
+
+        const modelData = vehicleHierarchy[brand] && vehicleHierarchy[brand][model];
+        if (modelData && !Array.isArray(modelData) && modelData[variant]) {
+            const meta = modelData[variant];
+            if (fuelSelect && meta.fuel_type) {
+                fuelSelect.value = meta.fuel_type;
+            }
+            if (transSelect && meta.transmission) {
+                transSelect.value = meta.transmission;
+            }
+        }
     }
 
     if (companySelect && modelSelect && variantSelect) {
         companySelect.addEventListener("change", updateModelDropdown);
         modelSelect.addEventListener("change", updateVariantDropdown);
+        variantSelect.addEventListener("change", autofillVariantSpecs);
         initHierarchy();
     }
 

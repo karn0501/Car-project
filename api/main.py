@@ -202,60 +202,115 @@ async def check_data_drift():
 @app.get("/hierarchy", tags=["Vehicle Metadata"])
 async def get_vehicle_hierarchy():
     """
-    Returns brand -> model -> variant dynamic hierarchy mapping for UI dropdown cascading.
+    Returns brand -> model -> variant dynamic hierarchy mapping with specification metadata
+    for UI dropdown cascading and automated spec autofill (Fuel Type, Transmission, Engine CC, Body Type).
     """
     default_hierarchy = {
         "Maruti": {
-            "Swift": ["VXi", "LXi", "ZXi", "ZXi Plus", "VDi", "ZDi"],
-            "Baleno": ["Delta", "Sigma", "Zeta", "Alpha"],
-            "Alto 800": ["LXi", "Std", "VXi"],
-            "Dzire": ["VXi", "LXi", "ZXi", "ZXi Plus"],
-            "Ertiga": ["VXi", "LXi", "ZXi", "ZXi Plus"],
-            "Brezza": ["VXi", "LXi", "ZXi", "ZXi Plus"],
-            "Wagon R": ["VXi", "LXi", "ZXi"]
+            "Swift": {
+                "VXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Hatchback"},
+                "LXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Hatchback"},
+                "ZXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Hatchback"},
+                "ZXi Plus": {"fuel_type": "Petrol", "transmission": "Automatic", "engine_cc": 1197, "body_type": "Hatchback"},
+                "VDi": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 1248, "body_type": "Hatchback"},
+                "ZDi": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 1248, "body_type": "Hatchback"}
+            },
+            "Baleno": {
+                "Delta": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Hatchback"},
+                "Sigma": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Hatchback"},
+                "Zeta": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Hatchback"},
+                "Alpha": {"fuel_type": "Petrol", "transmission": "Automatic", "engine_cc": 1197, "body_type": "Hatchback"}
+            },
+            "Alto 800": {
+                "LXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 796, "body_type": "Hatchback"},
+                "Std": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 796, "body_type": "Hatchback"},
+                "VXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 796, "body_type": "Hatchback"}
+            },
+            "Dzire": {
+                "VXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Sedan"},
+                "LXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Sedan"},
+                "ZXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Sedan"},
+                "ZXi Plus": {"fuel_type": "Petrol", "transmission": "Automatic", "engine_cc": 1197, "body_type": "Sedan"}
+            },
+            "Ertiga": {
+                "VXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1462, "body_type": "MUV"},
+                "LXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1462, "body_type": "MUV"},
+                "ZXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1462, "body_type": "MUV"},
+                "ZXi Plus": {"fuel_type": "Petrol", "transmission": "Automatic", "engine_cc": 1462, "body_type": "MUV"}
+            },
+            "Brezza": {
+                "VXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1462, "body_type": "SUV"},
+                "LXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1462, "body_type": "SUV"},
+                "ZXi": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1462, "body_type": "SUV"},
+                "ZXi Plus": {"fuel_type": "Petrol", "transmission": "Automatic", "engine_cc": 1462, "body_type": "SUV"}
+            }
         },
         "Hyundai": {
-            "Creta": ["SX", "E", "EX", "S", "SX(O)"],
-            "i20": ["Sportz", "Magna", "Asta", "Asta(O)"],
-            "Verna": ["SX", "EX", "SX(O)"],
-            "Venue": ["S", "E", "SX", "SX(O)"],
-            "Grand i10": ["Sportz", "Era", "Magna", "Asta"]
+            "Creta": {
+                "SX": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1497, "body_type": "SUV"},
+                "E": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1497, "body_type": "SUV"},
+                "EX": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1497, "body_type": "SUV"},
+                "S": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1497, "body_type": "SUV"},
+                "SX(O)": {"fuel_type": "Diesel", "transmission": "Automatic", "engine_cc": 1493, "body_type": "SUV"}
+            },
+            "i20": {
+                "Sportz": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Hatchback"},
+                "Magna": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Hatchback"},
+                "Asta": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1197, "body_type": "Hatchback"},
+                "Asta(O)": {"fuel_type": "Petrol", "transmission": "Automatic", "engine_cc": 1197, "body_type": "Hatchback"}
+            },
+            "Verna": {
+                "SX": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1497, "body_type": "Sedan"},
+                "EX": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1497, "body_type": "Sedan"},
+                "SX(O)": {"fuel_type": "Diesel", "transmission": "Automatic", "engine_cc": 1493, "body_type": "Sedan"}
+            }
         },
         "Tata": {
-            "Nexon": ["XZ", "XE", "XM", "XZ+", "XZ+(O)"],
-            "Harrier": ["XT", "XE", "XM", "XZ", "XZ+"],
-            "Punch": ["Adventure", "Pure", "Accomplished", "Creative"],
-            "Tiago": ["XT", "XE", "XM", "XZ", "XZ+"],
-            "Safari": ["XT", "XE", "XM", "XZ", "XZ+"]
+            "Nexon": {
+                "XZ": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1199, "body_type": "SUV"},
+                "XE": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1199, "body_type": "SUV"},
+                "XM": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1199, "body_type": "SUV"},
+                "XZ+": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 1497, "body_type": "SUV"},
+                "XZ+(O)": {"fuel_type": "Diesel", "transmission": "Automatic", "engine_cc": 1497, "body_type": "SUV"}
+            },
+            "Harrier": {
+                "XT": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 1956, "body_type": "SUV"},
+                "XE": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 1956, "body_type": "SUV"},
+                "XM": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 1956, "body_type": "SUV"},
+                "XZ": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 1956, "body_type": "SUV"},
+                "XZ+": {"fuel_type": "Diesel", "transmission": "Automatic", "engine_cc": 1956, "body_type": "SUV"}
+            }
         },
         "Mahindra": {
-            "Thar": ["LX", "AX", "AX(O)"],
-            "Scorpio-N": ["Z4", "Z2", "Z6", "Z8", "Z8L"],
-            "XUV700": ["AX5", "MX", "AX3", "AX7", "AX7L"],
-            "Bolero": ["B6", "B4", "B6(O)"],
-            "XUV300": ["W6", "W4", "W8", "W8(O)"]
+            "Thar": {
+                "LX": {"fuel_type": "Diesel", "transmission": "Automatic", "engine_cc": 2184, "body_type": "SUV"},
+                "AX": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1997, "body_type": "SUV"},
+                "AX(O)": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 2184, "body_type": "SUV"}
+            },
+            "XUV700": {
+                "AX5": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1997, "body_type": "SUV"},
+                "MX": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1997, "body_type": "SUV"},
+                "AX7L": {"fuel_type": "Diesel", "transmission": "Automatic", "engine_cc": 2184, "body_type": "SUV"}
+            }
         },
         "Honda": {
-            "City": ["VX", "SV", "V", "ZX"],
-            "Amaze": ["S", "E", "V", "VX"],
-            "Civic": ["VX", "V", "ZX"],
-            "WR-V": ["VX", "SV"]
+            "City": {
+                "VX": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1498, "body_type": "Sedan"},
+                "SV": {"fuel_type": "Petrol", "transmission": "Manual", "engine_cc": 1498, "body_type": "Sedan"},
+                "ZX": {"fuel_type": "Petrol", "transmission": "Automatic", "engine_cc": 1498, "body_type": "Sedan"}
+            }
         },
         "Toyota": {
-            "Innova Crysta": ["VX", "GX", "ZX"],
-            "Fortuner": ["4x2", "4x4", "Legender"],
-            "Glanza": ["G", "E", "S", "V"]
-        },
-        "Kia": {
-            "Seltos": ["HTX", "HTE", "HTK", "GTX", "X-Line"],
-            "Sonet": ["HTX", "HTE", "HTK", "GTX+"],
-            "Carens": ["Prestige", "Premium", "Luxury", "Luxury Plus"]
-        },
-        "Volkswagen": {
-            "Polo": ["Highline", "Trendline", "Comfortline", "GT TSI"],
-            "Vento": ["Highline", "Trendline", "Comfortline", "Highline Plus"],
-            "Virtus": ["Dynamic Line", "Performance Line", "GT"],
-            "Taigun": ["Highline", "Comfortline", "Topline", "GT"]
+            "Innova Crysta": {
+                "VX": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 2393, "body_type": "MUV"},
+                "GX": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 2393, "body_type": "MUV"},
+                "ZX": {"fuel_type": "Diesel", "transmission": "Automatic", "engine_cc": 2393, "body_type": "MUV"}
+            },
+            "Fortuner": {
+                "4x2": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 2755, "body_type": "SUV"},
+                "4x4": {"fuel_type": "Diesel", "transmission": "Manual", "engine_cc": 2755, "body_type": "SUV"},
+                "Legender": {"fuel_type": "Diesel", "transmission": "Automatic", "engine_cc": 2755, "body_type": "SUV"}
+            }
         }
     }
 
@@ -269,8 +324,15 @@ async def get_vehicle_hierarchy():
             for comp in companies:
                 models_dict = {}
                 for m in comp.models:
-                    variants = [v.name for v in m.variants] if m.variants else ["Base"]
-                    models_dict[m.name] = list(set(variants))
+                    variant_meta = {}
+                    for v in m.variants:
+                        variant_meta[v.name] = {
+                            "fuel_type": v.fuel_type or "Petrol",
+                            "transmission": v.transmission or "Manual",
+                            "engine_cc": v.engine_cc or 1197.0,
+                            "body_type": m.body_type or "Hatchback"
+                        }
+                    models_dict[m.name] = variant_meta
                 if models_dict:
                     db_hierarchy[comp.name] = models_dict
             db.close()
