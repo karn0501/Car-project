@@ -1,22 +1,36 @@
 /* 
-   AutoValuate AI — Application Logic & API Integration
-   Connects UI components to FastAPI backend endpoints.
+   AutoValuate AI — Application Logic & API Connectors
+   Connects modern UI elements to FastAPI backend endpoints.
 */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Tab Navigation
-    const tabBtns = document.querySelectorAll(".tab-btn");
-    const tabContents = document.querySelectorAll(".tab-content");
+    // 1. KM Driven Slider & Input Display Sync
+    const kmInput = document.getElementById("km_driven");
+    const kmDisplay = document.getElementById("km-val-display");
 
-    tabBtns.forEach(btn => {
-        btn.addEventListener("click", () => {
-            const targetId = btn.getAttribute("data-tab");
-            
-            tabBtns.forEach(b => b.classList.remove("active"));
-            tabContents.forEach(c => c.classList.remove("active"));
+    if (kmInput && kmDisplay) {
+        kmInput.addEventListener("input", (e) => {
+            const val = parseInt(e.target.value) || 0;
+            kmDisplay.innerText = val.toLocaleString("en-IN") + " km";
+        });
+    }
 
-            btn.classList.add("active");
-            document.getElementById(targetId).classList.add("active");
+    // 2. Tab Navigation System
+    const navLinks = document.querySelectorAll(".nav-link");
+    const tabPanes = document.querySelectorAll(".tab-pane");
+
+    navLinks.forEach(link => {
+        link.addEventListener("click", () => {
+            const targetId = link.getAttribute("data-tab");
+
+            navLinks.forEach(l => l.classList.remove("active"));
+            tabPanes.forEach(p => p.classList.remove("active"));
+
+            link.classList.add("active");
+            const targetPane = document.getElementById(targetId);
+            if (targetPane) {
+                targetPane.classList.add("active");
+            }
 
             if (targetId === "trend-tab") {
                 renderTrendChart("Maruti Swift");
@@ -24,16 +38,38 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 2. Valuation Form Submission
-    const valuationForm = document.getElementById("valuation-form");
+    // 3. Currency & Language Dropdown Handlers
+    const currencySelect = document.getElementById("currency-select");
+    const langSelect = document.getElementById("lang-select");
+
+    let lastValuationPayload = null;
     let currentPredictionId = null;
 
+    if (currencySelect) {
+        currencySelect.addEventListener("change", () => {
+            if (lastValuationPayload) {
+                triggerValuation(lastValuationPayload);
+            }
+        });
+    }
+
+    if (langSelect) {
+        langSelect.addEventListener("change", () => {
+            if (lastValuationPayload) {
+                triggerValuation(lastValuationPayload);
+            }
+        });
+    }
+
+    // 4. Valuation Form Submission
+    const valuationForm = document.getElementById("valuation-form");
+
     if (valuationForm) {
-        valuationForm.addEventListener("submit", async (e) => {
+        valuationForm.addEventListener("submit", (e) => {
             e.preventDefault();
 
             const formData = new FormData(valuationForm);
-            const payload = {
+            lastValuationPayload = {
                 company_name: formData.get("company_name"),
                 model_name: formData.get("model_name"),
                 variant_name: formData.get("variant_name"),
@@ -45,58 +81,120 @@ document.addEventListener("DOMContentLoaded", () => {
                 description: formData.get("description") || null
             };
 
-            const curr = document.getElementById("currency-select") ? document.getElementById("currency-select").value : "INR";
-            const lang = document.getElementById("lang-select") ? document.getElementById("lang-select").value : "en";
+            triggerValuation(lastValuationPayload);
+        });
+    }
 
+    async function triggerValuation(payload) {
+        const curr = currencySelect ? currencySelect.value : "INR";
+        const lang = langSelect ? langSelect.value : "en";
+
+        try {
+            const response = await fetch(`/predict/localized?currency=${curr}&lang=${lang}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error("Prediction API Error");
+
+            const result = await response.json();
+            currentPredictionId = result.prediction_id;
+
+            // Fetch Fraud Audit
             try {
-                const response = await fetch(`/predict/localized?currency=${curr}&lang=${lang}`, {
+                const fraudRes = await fetch("/fraud/evaluate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
                 });
+                if (fraudRes.ok) {
+                    result.fraud_report = await fraudRes.json();
+                }
+            } catch (e) {}
 
-                if (!response.ok) throw new Error("Prediction API Error");
+            // Fetch Dealer Tiers
+            try {
+                const dealerRes = await fetch("/dealer/analytics", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                if (dealerRes.ok) {
+                    result.dealer_analytics = await dealerRes.json();
+                }
+            } catch (e) {}
 
-                const result = await response.json();
-                currentPredictionId = result.prediction_id;
-
-                displayValuationResult(result);
-            } catch (err) {
-                alert("Error calculating valuation. Check server status.");
-            }
-        });
+            displayValuationOutput(result);
+        } catch (err) {
+            alert("Error calculating valuation. Please verify server connection.");
+        }
     }
 
-    function displayValuationResult(data) {
+    function displayValuationOutput(data) {
         document.getElementById("valuation-placeholder").classList.add("hidden");
         document.getElementById("valuation-output").classList.remove("hidden");
 
-        const formattedPrice = "₹" + Math.round(data.predicted_price).toLocaleString("en-IN");
-        const formattedLow = "₹" + Math.round(data.price_range_low).toLocaleString("en-IN");
-        const formattedHigh = "₹" + Math.round(data.price_range_high).toLocaleString("en-IN");
+        const sym = getCurrencySymbol(data.currency || "INR");
 
-        document.getElementById("predicted-price-text").innerText = formattedPrice;
-        document.getElementById("price-range-text").innerText = `${formattedLow} – ${formattedHigh}`;
+        // Price Hero
+        document.getElementById("predicted-price-text").innerText = data.formatted_price || (sym + Math.round(data.predicted_price).toLocaleString());
+        document.getElementById("price-low-val").innerText = sym + Math.round(data.price_range_low).toLocaleString();
+        document.getElementById("price-high-val").innerText = sym + Math.round(data.price_range_high).toLocaleString();
 
-        // SHAP breakdown
+        if (data.timestamp) {
+            document.getElementById("pred-timestamp").innerText = data.timestamp.split("T")[0];
+        }
+
+        // Fraud & NLP Badges
+        if (data.fraud_report) {
+            document.getElementById("fraud-level-text").innerText = `${data.fraud_report.risk_level} RISK (${data.fraud_report.fraud_risk_score})`;
+            const badge = document.getElementById("fraud-badge");
+            badge.className = `audit-badge ${data.fraud_report.risk_level === 'HIGH' ? 'badge-danger' : 'badge-safe'}`;
+        }
+
+        if (data.description_quality_score !== null && data.description_quality_score !== undefined) {
+            const score = data.description_quality_score;
+            const label = score >= 0.7 ? "High" : (score >= 0.45 ? "Medium" : "Low");
+            document.getElementById("nlp-score-text").innerText = `${label} (${score.toFixed(2)})`;
+        }
+
+        // SHAP Breakdown Bars
         const shapContainer = document.getElementById("shap-bars-container");
         shapContainer.innerHTML = "";
 
-        data.shap_breakdown.forEach(item => {
-            const div = document.createElement("div");
-            div.className = "shap-item";
-            const valFormatted = (item.impact_inr > 0 ? "+₹" : "-₹") + Math.abs(Math.round(item.impact_inr)).toLocaleString("en-IN");
-            const cls = item.impact_inr >= 0 ? "impact-pos" : "impact-neg";
+        if (data.shap_breakdown && data.shap_breakdown.length > 0) {
+            data.shap_breakdown.forEach(item => {
+                const row = document.createElement("div");
+                row.className = "shap-row";
 
-            div.innerHTML = `
-                <span>${item.feature}</span>
-                <span class="${cls}">${valFormatted}</span>
-            `;
-            shapContainer.appendChild(div);
-        });
+                const isPos = item.impact_inr >= 0;
+                const valFormatted = (isPos ? "+" : "-") + sym + Math.abs(Math.round(item.impact_inr)).toLocaleString();
+                const cls = isPos ? "shap-val-pos" : "shap-val-neg";
+
+                row.innerHTML = `
+                    <span>${item.feature}</span>
+                    <span class="${cls}">${valFormatted}</span>
+                `;
+                shapContainer.appendChild(row);
+            });
+        }
+
+        // Commercial Dealer Pricing Tiers
+        if (data.dealer_analytics && data.dealer_analytics.pricing_tiers) {
+            const tiers = data.dealer_analytics.pricing_tiers;
+            document.getElementById("tier-tradein-val").innerText = sym + Math.round(tiers.trade_in_wholesale).toLocaleString();
+            document.getElementById("tier-private-val").innerText = sym + Math.round(tiers.private_party).toLocaleString();
+            document.getElementById("tier-retail-val").innerText = sym + Math.round(tiers.retail_showroom).toLocaleString();
+        }
     }
 
-    // 3. PDF Download Handler
+    function getCurrencySymbol(curr) {
+        const map = { "INR": "₹", "USD": "$", "EUR": "€", "GBP": "£", "AED": "AED ", "JPY": "¥" };
+        return map[curr] || "₹";
+    }
+
+    // 5. PDF Download Handler
     const downloadPdfBtn = document.getElementById("download-pdf-btn");
     if (downloadPdfBtn) {
         downloadPdfBtn.addEventListener("click", () => {
@@ -105,17 +203,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 4. Comparable Listings Handler
+    // 6. Comparable Listings Handler
     const findCompBtn = document.getElementById("find-comparable-btn");
     if (findCompBtn) {
         findCompBtn.addEventListener("click", async () => {
-            const company = document.getElementById("company_name").value;
-            const model = document.getElementById("model_name").value;
-            const year = document.getElementById("manufacture_year").value;
-            const city = document.getElementById("city").value;
+            if (!lastValuationPayload) return;
+            const { company_name, model_name, manufacture_year, city } = lastValuationPayload;
 
             try {
-                const res = await fetch(`/compare?company=${company}&model=${model}&year=${year}&city=${city}`);
+                const res = await fetch(`/compare?company=${company_name}&model=${model_name}&year=${manufacture_year}&city=${city}`);
                 const data = await res.json();
 
                 const box = document.getElementById("comparable-listings-box");
@@ -128,22 +224,22 @@ document.addEventListener("DOMContentLoaded", () => {
                         div.className = "comp-item";
                         div.innerHTML = `
                             <span><strong>${item.company_name} ${item.model_name} ${item.variant_name}</strong> (${item.manufacture_year})</span>
-                            <span>₹${item.asking_price.toLocaleString("en-IN")} • ${item.km_driven.toLocaleString("en-IN")} km</span>
+                            <span>₹${item.asking_price.toLocaleString()} • ${item.km_driven.toLocaleString()} km</span>
                         `;
                         list.appendChild(div);
                     });
                 } else {
-                    list.innerHTML = "<p>No direct matches found in current database sample.</p>";
+                    list.innerHTML = "<p class='text-muted'>No direct comparable matches in database sample.</p>";
                 }
 
                 box.classList.remove("hidden");
             } catch (e) {
-                alert("Error fetching comparables.");
+                alert("Error fetching comparable listings.");
             }
         });
     }
 
-    // 5. Chatbot Form Handler
+    // 7. Chatbot Form Handler
     const chatForm = document.getElementById("chat-form");
     if (chatForm) {
         chatForm.addEventListener("submit", async (e) => {
@@ -168,31 +264,39 @@ document.addEventListener("DOMContentLoaded", () => {
                     const low = "₹" + Math.round(data.prediction.price_range_low).toLocaleString("en-IN");
                     const high = "₹" + Math.round(data.prediction.price_range_high).toLocaleString("en-IN");
 
-                    const reply = `I parsed your vehicle query as: <b>${data.parsed.company_name} ${data.parsed.model_name} ${data.parsed.variant_name} (${data.parsed.manufacture_year})</b>, ${data.parsed.km_driven.toLocaleString()} km in ${data.parsed.city}.<br><br>` +
+                    const reply = `I parsed your query as: <b>${data.parsed.company_name} ${data.parsed.model_name} ${data.parsed.variant_name} (${data.parsed.manufacture_year})</b>, ${data.parsed.km_driven.toLocaleString()} km in ${data.parsed.city}.<br><br>` +
                                   `💰 <b>Estimated Valuation: ${price}</b><br>` +
                                   `📊 Confidence Range: ${low} – ${high}`;
                     appendChatMessage("bot", reply);
                 } else {
-                    appendChatMessage("bot", "Could not parse query properly. Please try including year, model, and city.");
+                    appendChatMessage("bot", "Could not parse query. Try entering year, model, and city.");
                 }
             } catch (err) {
-                appendChatMessage("bot", "Sorry, an error occurred while calculating valuation.");
+                appendChatMessage("bot", "Error calculating chat valuation.");
             }
         });
     }
 
+    window.fillChatPrompt = function(promptText) {
+        const chatInput = document.getElementById("chat-input");
+        if (chatInput) {
+            chatInput.value = promptText;
+            chatInput.focus();
+        }
+    };
+
     function appendChatMessage(sender, htmlContent) {
         const chatBox = document.getElementById("chat-messages");
         const msgDiv = document.createElement("div");
-        msgDiv.className = `message ${sender}-message`;
+        msgDiv.className = `chat-msg ${sender}`;
 
-        const icon = sender === "bot" ? '<i class="fa-solid fa-robot message-icon"></i>' : '<i class="fa-solid fa-user message-icon"></i>';
-        msgDiv.innerHTML = `${icon}<div class="message-bubble">${htmlContent}</div>`;
+        const icon = sender === "bot" ? '<i class="fa-solid fa-robot"></i>' : '<i class="fa-solid fa-user"></i>';
+        msgDiv.innerHTML = `<div class="msg-avatar">${icon}</div><div class="msg-content">${htmlContent}</div>`;
         chatBox.appendChild(msgDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // 6. PyTorch Image Upload Handler
+    // 8. PyTorch CNN Image Upload Handler
     const dropZone = document.getElementById("drop-zone");
     const imageUpload = document.getElementById("image-upload");
 
@@ -219,16 +323,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 document.getElementById("tier-badge").innerText = `Tier ${data.predicted_tier}: ${data.condition_label}`;
                 document.getElementById("condition-score-val").innerText = `Visual Score: ${data.visual_condition_score.toFixed(2)} / 1.00`;
-                document.getElementById("condition-label-text").innerText = `Model predictions complete with PyTorch MobileNetV3 CNN.`;
+                document.getElementById("condition-label-text").innerText = `MobileNetV3 CNN defect analysis completed.`;
 
                 imgResult.classList.remove("hidden");
             } catch (err) {
-                alert("Error processing image.");
+                alert("Error analyzing image.");
             }
         });
     }
 
-    // 7. Chart.js Price Trend Render
+    // 9. Chart.js Price Trend Render
     let trendChartInstance = null;
 
     async function renderTrendChart(variantKey) {
@@ -246,6 +350,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 trendChartInstance.destroy();
             }
 
+            const chartCtx = ctx.getContext("2d");
+            const gradient = chartCtx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, "rgba(0, 242, 254, 0.4)");
+            gradient.addColorStop(1, "rgba(0, 242, 254, 0.0)");
+
             trendChartInstance = new Chart(ctx, {
                 type: "line",
                 data: {
@@ -254,10 +363,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         label: `Price Forecast for ${variantKey} (INR)`,
                         data: prices,
                         borderColor: "#00f2fe",
-                        backgroundColor: "rgba(0, 242, 254, 0.1)",
+                        borderWidth: 3,
+                        backgroundColor: gradient,
                         fill: true,
-                        tension: 0.3,
-                        pointRadius: 6
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: "#00f2fe"
                     }]
                 },
                 options: {
@@ -274,7 +385,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     },
                     plugins: {
-                        legend: { labels: { color: "#f1f5f9" } }
+                        legend: { labels: { color: "#f8fafc" } }
                     }
                 }
             });

@@ -3,177 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoValuate AI — Next-Gen Used Car Price Intelligence Platform</title>
-    <meta name="description" content="AI/ML powered used car price prediction platform with SHAP explainability, PyTorch MobileNet CNN condition scoring, and LSTM price trend forecasting.">
+    <title>AutoValuate AI — Enterprise Used Car Price Intelligence Platform</title>
+    <meta name="description" content="State-of-the-art AI used car valuation platform featuring Stacked ML Ensemble (CatBoost/XGBoost/LightGBM), SHAP Explainable AI, PyTorch MobileNet CNN condition scoring, and 5-year depreciation forecasting.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="brand">
-                <i class="fa-solid fa-car-side brand-icon"></i>
-                <span class="brand-name">AutoValuate <span class="badge-ai">AI PRO</span></span>
+<body class="dark-theme">
+    <!-- Ambient Glow Orbs -->
+    <div class="ambient-glow glow-cyan"></div>
+    <div class="ambient-glow glow-purple"></div>
+    <div class="ambient-glow glow-emerald"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="navbar-header">
+        <div class="nav-content">
+            <div class="brand-logo">
+                <div class="logo-icon-bg">
+                    <i class="fa-solid fa-car-burst"></i>
+                </div>
+                <div class="brand-title">
+                    <span class="title-main">AutoValuate<span class="title-accent">AI</span></span>
+                    <span class="title-badge">ENTERPRISE 3.0</span>
+                </div>
             </div>
-            <div class="nav-tabs">
-                <button class="tab-btn active" data-tab="valuation-tab"><i class="fa-solid fa-calculator"></i> Valuation</button>
-                <button class="tab-btn" data-tab="chatbot-tab"><i class="fa-solid fa-robot"></i> AI Chat Assistant</button>
-                <button class="tab-btn" data-tab="vision-tab"><i class="fa-solid fa-camera"></i> Condition Scorer</button>
-                <button class="tab-btn" data-tab="trend-tab"><i class="fa-solid fa-chart-line"></i> Price Trends</button>
-            </div>
-            <div class="nav-actions">
-                <select id="currency-select" class="nav-select" title="Target Currency">
-                    <option value="INR">₹ INR</option>
-                    <option value="USD">$ USD</option>
-                    <option value="EUR">€ EUR</option>
-                    <option value="GBP">£ GBP</option>
-                    <option value="AED">AED</option>
-                    <option value="JPY">¥ JPY</option>
-                </select>
-                <select id="lang-select" class="nav-select" title="Language">
-                    <option value="en">🌐 EN</option>
-                    <option value="hi">🇮🇳 HI</option>
-                    <option value="es">🇪🇸 ES</option>
-                    <option value="ar">🇦🇪 AR</option>
-                </select>
-                <span id="api-status-badge" class="status-badge"><i class="fa-solid fa-circle-check"></i> API Online</span>
-                <button id="auth-modal-btn" class="btn-secondary"><i class="fa-solid fa-user"></i> Account</button>
+
+            <!-- Navigation Tabs -->
+            <nav class="nav-menu">
+                <button class="nav-link active" data-tab="valuation-tab">
+                    <i class="fa-solid fa-gauge-high"></i> <span>Valuation Engine</span>
+                </button>
+                <button class="nav-link" data-tab="chatbot-tab">
+                    <i class="fa-solid fa-headset"></i> <span>AI Assistant</span>
+                </button>
+                <button class="nav-link" data-tab="vision-tab">
+                    <i class="fa-solid fa-eye"></i> <span>CNN Condition</span>
+                </button>
+                <button class="nav-link" data-tab="trend-tab">
+                    <i class="fa-solid fa-chart-line"></i> <span>Price Trends</span>
+                </button>
+            </nav>
+
+            <!-- Navbar Control Controls -->
+            <div class="nav-controls">
+                <div class="select-pill">
+                    <i class="fa-solid fa-coins icon-gold"></i>
+                    <select id="currency-select" title="Currency">
+                        <option value="INR">₹ INR</option>
+                        <option value="USD">$ USD</option>
+                        <option value="EUR">€ EUR</option>
+                        <option value="GBP">£ GBP</option>
+                        <option value="AED">AED</option>
+                        <option value="JPY">¥ JPY</option>
+                    </select>
+                </div>
+
+                <div class="select-pill">
+                    <i class="fa-solid fa-globe icon-blue"></i>
+                    <select id="lang-select" title="Language">
+                        <option value="en">English</option>
+                        <option value="hi">हिन्दी</option>
+                        <option value="es">Español</option>
+                        <option value="ar">العربية</option>
+                    </select>
+                </div>
+
+                <div class="status-indicator">
+                    <span class="ping-dot"></span>
+                    <span class="status-text">Live System</span>
+                </div>
+
+                <button id="auth-modal-btn" class="btn-glow-user">
+                    <i class="fa-solid fa-shield-halved"></i> <span>Account</span>
+                </button>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Content Container -->
-    <main class="main-wrapper">
+    <!-- Header Metric Banner -->
+    <div class="stats-banner">
+        <div class="stats-container">
+            <div class="stat-pill">
+                <i class="fa-solid fa-database stat-icon icon-cyan"></i>
+                <div class="stat-info">
+                    <span class="stat-val">22,430+</span>
+                    <span class="stat-lbl">Market Listings</span>
+                </div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-pill">
+                <i class="fa-solid fa-microchip stat-icon icon-purple"></i>
+                <div class="stat-info">
+                    <span class="stat-val">99.87%</span>
+                    <span class="stat-lbl">Ensemble R² Accuracy</span>
+                </div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-pill">
+                <i class="fa-solid fa-brain stat-icon icon-emerald"></i>
+                <div class="stat-info">
+                    <span class="stat-val">SHAP XAI</span>
+                    <span class="stat-lbl">Native C++ Engine</span>
+                </div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-pill">
+                <i class="fa-solid fa-shield-cat stat-icon icon-amber"></i>
+                <div class="stat-info">
+                    <span class="stat-val">Fraud Guard</span>
+                    <span class="stat-lbl">Odometer Audit</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <main class="app-main">
         <!-- TAB 1: VALUATION ENGINE -->
-        <section id="valuation-tab" class="tab-content active">
-            <div class="grid-2col">
-                <!-- Form Card -->
-                <div class="glass-card">
-                    <div class="card-header">
-                        <h2><i class="fa-solid fa-sliders text-cyan"></i> Vehicle Specifications</h2>
-                        <p>Enter details to trigger the Phase 3 Stacked ML Ensemble Engine</p>
+        <section id="valuation-tab" class="tab-pane active">
+            <div class="layout-grid">
+                <!-- Vehicle Specs Form Card -->
+                <div class="glass-panel form-panel">
+                    <div class="panel-head">
+                        <div class="head-title">
+                            <i class="fa-solid fa-sliders head-icon icon-cyan"></i>
+                            <div>
+                                <h2>Vehicle Specifications</h2>
+                                <p>Configure attributes for Stacked ML Ensemble calculation</p>
+                            </div>
+                        </div>
                     </div>
-                    <form id="valuation-form">
+
+                    <form id="valuation-form" class="smart-form">
+                        <!-- Manufacturer & Model -->
                         <div class="form-row">
-                            <div class="form-group">
+                            <div class="form-field">
                                 <label for="company_name">Manufacturer</label>
-                                <select id="company_name" name="company_name" required>
-                                    <option value="Maruti">Maruti Suzuki</option>
-                                    <option value="Hyundai">Hyundai</option>
-                                    <option value="Tata">Tata Motors</option>
-                                    <option value="Mahindra">Mahindra</option>
-                                    <option value="Honda">Honda</option>
-                                    <option value="Toyota">Toyota</option>
-                                    <option value="Kia">Kia Motors</option>
-                                    <option value="Volkswagen">Volkswagen</option>
-                                </select>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-building input-icon"></i>
+                                    <select id="company_name" name="company_name" required>
+                                        <option value="Maruti">Maruti Suzuki</option>
+                                        <option value="Hyundai">Hyundai</option>
+                                        <option value="Tata">Tata Motors</option>
+                                        <option value="Mahindra">Mahindra</option>
+                                        <option value="Honda">Honda</option>
+                                        <option value="Toyota">Toyota</option>
+                                        <option value="Kia">Kia Motors</option>
+                                        <option value="Volkswagen">Volkswagen</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-field">
                                 <label for="model_name">Model Name</label>
-                                <input type="text" id="model_name" name="model_name" value="Swift" required placeholder="e.g. Swift, Creta, City">
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-car input-icon"></i>
+                                    <input type="text" id="model_name" name="model_name" value="Swift" required placeholder="e.g. Swift, Creta, City">
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Variant & Year -->
                         <div class="form-row">
-                            <div class="form-group">
-                                <label for="variant_name">Variant Name</label>
-                                <input type="text" id="variant_name" name="variant_name" value="VXi" required placeholder="e.g. VXi, SX, XZ">
+                            <div class="form-field">
+                                <label for="variant_name">Variant / Trim</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-tags input-icon"></i>
+                                    <input type="text" id="variant_name" name="variant_name" value="VXi" required placeholder="e.g. VXi, SX, XZ">
+                                </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-field">
                                 <label for="manufacture_year">Manufacture Year</label>
-                                <input type="number" id="manufacture_year" name="manufacture_year" value="2020" min="1995" max="2026" required>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-calendar input-icon"></i>
+                                    <input type="number" id="manufacture_year" name="manufacture_year" value="2021" min="1995" max="2026" required>
+                                </div>
                             </div>
                         </div>
 
+                        <!-- KM Driven Slider & City -->
                         <div class="form-row">
-                            <div class="form-group">
-                                <label for="km_driven">KM Driven</label>
-                                <input type="number" id="km_driven" name="km_driven" value="35000" min="0" max="500000" required>
+                            <div class="form-field">
+                                <label for="km_driven">KM Driven: <strong id="km-val-display" class="highlight-cyan">25,000 km</strong></label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-road input-icon"></i>
+                                    <input type="number" id="km_driven" name="km_driven" value="25000" min="0" max="500000" required>
+                                </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-field">
                                 <label for="city">Registration City</label>
-                                <select id="city" name="city">
-                                    <option value="Mumbai">Mumbai</option>
-                                    <option value="Delhi">Delhi</option>
-                                    <option value="Bangalore">Bangalore</option>
-                                    <option value="Hyderabad">Hyderabad</option>
-                                    <option value="Chennai">Chennai</option>
-                                    <option value="Pune">Pune</option>
-                                    <option value="Ahmedabad">Ahmedabad</option>
-                                </select>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-location-dot input-icon"></i>
+                                    <select id="city" name="city">
+                                        <option value="Mumbai">Mumbai</option>
+                                        <option value="Delhi">Delhi NCR</option>
+                                        <option value="Bangalore">Bangalore</option>
+                                        <option value="Hyderabad">Hyderabad</option>
+                                        <option value="Chennai">Chennai</option>
+                                        <option value="Pune">Pune</option>
+                                        <option value="Ahmedabad">Ahmedabad</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Fuel & Transmission -->
                         <div class="form-row">
-                            <div class="form-group">
+                            <div class="form-field">
                                 <label for="fuel_type">Fuel Type</label>
-                                <select id="fuel_type" name="fuel_type">
-                                    <option value="Petrol">Petrol</option>
-                                    <option value="Diesel">Diesel</option>
-                                    <option value="CNG">CNG</option>
-                                    <option value="Electric">Electric</option>
-                                </select>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-gas-pump input-icon"></i>
+                                    <select id="fuel_type" name="fuel_type">
+                                        <option value="Petrol">Petrol</option>
+                                        <option value="Diesel">Diesel</option>
+                                        <option value="CNG">CNG</option>
+                                        <option value="Electric">Electric EV</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-field">
                                 <label for="transmission">Transmission</label>
-                                <select id="transmission" name="transmission">
-                                    <option value="Manual">Manual</option>
-                                    <option value="Automatic">Automatic</option>
-                                </select>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-gears input-icon"></i>
+                                    <select id="transmission" name="transmission">
+                                        <option value="Manual">Manual</option>
+                                        <option value="Automatic">Automatic</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="description">Free-Text Description (Optional for NLP Quality Scoring)</label>
-                            <textarea id="description" name="description" rows="2" placeholder="e.g. Single owner, showroom condition, full service history, no scratches..."></textarea>
+                        <!-- Free-Text Description -->
+                        <div class="form-field">
+                            <label for="description">Listing Quality Description (Optional NLP Scorer)</label>
+                            <textarea id="description" name="description" rows="2" placeholder="e.g. First owner, showroom maintained with full service history, no scratches, accident free..."></textarea>
                         </div>
 
-                        <button type="submit" class="btn-primary w-full"><i class="fa-solid fa-wand-magic-sparkles"></i> Calculate AI Resale Valuation</button>
+                        <button type="submit" class="btn-hero-primary">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Compute Fair Market Valuation
+                        </button>
                     </form>
                 </div>
 
-                <!-- Results Output Card -->
-                <div class="glass-card result-container">
-                    <div class="card-header">
-                        <h2><i class="fa-solid fa-chart-pie text-emerald"></i> Prediction Output</h2>
-                        <p>Real-time valuation backed by 22,430+ market listings & SHAP explainability</p>
+                <!-- Valuation Output Dashboard Card -->
+                <div class="glass-panel result-panel">
+                    <div class="panel-head">
+                        <div class="head-title">
+                            <i class="fa-solid fa-chart-pie head-icon icon-emerald"></i>
+                            <div>
+                                <h2>Valuation Intelligence</h2>
+                                <p>Multi-model prediction breakdown & SHAP explainability</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div id="valuation-placeholder" class="placeholder-state">
-                        <i class="fa-solid fa-car-tunnel placeholder-icon"></i>
-                        <p>Fill in vehicle specs and click <b>Calculate AI Valuation</b> to generate instant market estimate.</p>
+                    <!-- Placeholder Empty State -->
+                    <div id="valuation-placeholder" class="empty-state">
+                        <div class="empty-glow-ring">
+                            <i class="fa-solid fa-car-side empty-icon"></i>
+                        </div>
+                        <h3>Ready for Valuation</h3>
+                        <p>Fill in vehicle specs on the left and click <b>Compute Fair Market Valuation</b> to generate real-time price intelligence.</p>
                     </div>
 
+                    <!-- Prediction Result Dashboard -->
                     <div id="valuation-output" class="hidden">
-                        <div class="hero-price-card">
-                            <span class="price-label">Estimated Fair Market Resale Value</span>
-                            <h1 id="predicted-price-text" class="price-val">₹6,50,000</h1>
-                            <div class="range-pill">
-                                <span>Confidence Range: <strong id="price-range-text">₹5,72,000 – ₹7,28,000</strong></span>
+                        <!-- Hero Price Card -->
+                        <div class="hero-valuation-card">
+                            <div class="valuation-meta">
+                                <span class="badge-live-val"><i class="fa-solid fa-check-double"></i> Verified ML Estimate</span>
+                                <span id="pred-timestamp" class="meta-time">2026-07-24</span>
+                            </div>
+                            <span class="hero-label">Estimated Fair Resale Market Value</span>
+                            <div class="hero-price-display">
+                                <h1 id="predicted-price-text">₹6,50,000</h1>
+                            </div>
+
+                            <div class="confidence-bar-wrapper">
+                                <div class="conf-labels">
+                                    <span>Low: <strong id="price-low-val">₹5,72,000</strong></span>
+                                    <span>Expected Range</span>
+                                    <span>High: <strong id="price-high-val">₹7,28,000</strong></span>
+                                </div>
+                                <div class="conf-track">
+                                    <div class="conf-fill"></div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="shap-section">
-                            <h3><i class="fa-solid fa-diagram-project"></i> SHAP Feature Impact Breakdown</h3>
-                            <div id="shap-bars-container" class="shap-bars"></div>
+                        <!-- Security & Fraud Audit Badge -->
+                        <div class="audit-row">
+                            <div class="audit-badge badge-safe" id="fraud-badge">
+                                <i class="fa-solid fa-shield-check"></i>
+                                <span>Fraud Security: <strong id="fraud-level-text">LOW RISK (0.05)</strong></span>
+                            </div>
+                            <div class="audit-badge badge-info" id="nlp-badge">
+                                <i class="fa-solid fa-file-circle-check"></i>
+                                <span>Listing Quality: <strong id="nlp-score-text">High (0.85)</strong></span>
+                            </div>
                         </div>
 
-                        <div class="action-buttons-row">
-                            <button id="download-pdf-btn" class="btn-emerald"><i class="fa-solid fa-file-pdf"></i> Download PDF Valuation Report</button>
-                            <button id="find-comparable-btn" class="btn-secondary"><i class="fa-solid fa-layer-group"></i> View Similar Listings</button>
+                        <!-- SHAP Breakdown Section -->
+                        <div class="shap-card">
+                            <div class="section-title">
+                                <h3><i class="fa-solid fa-diagram-project icon-cyan"></i> SHAP Explainability (Feature Impact)</h3>
+                            </div>
+                            <div id="shap-bars-container" class="shap-list"></div>
                         </div>
 
-                        <div id="comparable-listings-box" class="comparable-box hidden">
-                            <h4>Comparable Database Listings</h4>
-                            <div id="comparable-list" class="comp-list"></div>
+                        <!-- Commercial Dealer Pricing Tiers -->
+                        <div class="dealer-tiers-grid">
+                            <div class="tier-card tier-tradein">
+                                <span class="tier-name">Wholesale Trade-In</span>
+                                <h3 id="tier-tradein-val">₹5,52,500</h3>
+                                <p>Instant dealer buyout</p>
+                            </div>
+                            <div class="tier-card tier-private">
+                                <span class="tier-name">Private Party</span>
+                                <h3 id="tier-private-val">₹6,50,000</h3>
+                                <p>Peer-to-peer fair value</p>
+                            </div>
+                            <div class="tier-card tier-retail">
+                                <span class="tier-name">Retail Showroom</span>
+                                <h3 id="tier-retail-val">₹7,28,000</h3>
+                                <p>Certified dealer listing</p>
+                            </div>
+                        </div>
+
+                        <!-- Action Toolbar -->
+                        <div class="action-toolbar">
+                            <button id="download-pdf-btn" class="btn-action btn-pdf">
+                                <i class="fa-solid fa-file-pdf"></i> Download Valuation PDF
+                            </button>
+                            <button id="find-comparable-btn" class="btn-action btn-comp">
+                                <i class="fa-solid fa-layer-group"></i> Similar Listings
+                            </button>
+                        </div>
+
+                        <!-- Comparable Listings Drawer -->
+                        <div id="comparable-listings-box" class="comp-box hidden">
+                            <h4>Database Market Matches</h4>
+                            <div id="comparable-list" class="comp-scroll"></div>
                         </div>
                     </div>
                 </div>
@@ -181,46 +356,70 @@
         </section>
 
         <!-- TAB 2: AI CONVERSATIONAL CHATBOT -->
-        <section id="chatbot-tab" class="tab-content">
-            <div class="glass-card chat-wrapper">
-                <div class="card-header">
-                    <h2><i class="fa-solid fa-comments text-cyan"></i> AI Conversational Car Valuation Assistant</h2>
-                    <p>Type a sentence like <i>"2021 Hyundai Creta SX Diesel automatic 25000 km in Delhi"</i> for instant parsing & valuation.</p>
-                </div>
-                <div id="chat-messages" class="chat-box">
-                    <div class="message bot-message">
-                        <i class="fa-solid fa-robot message-icon"></i>
-                        <div class="message-bubble">
-                            Hello! I am your AI Used Car Valuation Assistant. Tell me about the car you'd like to value (e.g. <i>"2019 Swift VXi petrol 40,000 km in Mumbai"</i>).
+        <section id="chatbot-tab" class="tab-pane">
+            <div class="glass-panel chat-container">
+                <div class="panel-head">
+                    <div class="head-title">
+                        <i class="fa-solid fa-robot head-icon icon-cyan"></i>
+                        <div>
+                            <h2>Conversational AI Valuation Assistant</h2>
+                            <p>Speak or type in plain English — e.g., <i>"2021 Hyundai Creta SX Diesel automatic 25000 km in Delhi"</i></p>
                         </div>
                     </div>
                 </div>
-                <form id="chat-form" class="chat-input-row">
-                    <input type="text" id="chat-input" placeholder="Type your vehicle details in plain English..." required>
-                    <button type="submit" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> Send</button>
+
+                <div class="chat-viewport" id="chat-messages">
+                    <div class="chat-msg bot">
+                        <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                        <div class="msg-content">
+                            Welcome! I'm your AI Valuation Assistant. Type vehicle specifications in plain text and I'll extract parameters and calculate your resale valuation instantly.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-chips">
+                    <button class="chip" onclick="fillChatPrompt('2021 Hyundai Creta SX Diesel 20000 km in Delhi')">💡 2021 Creta SX Diesel in Delhi</button>
+                    <button class="chip" onclick="fillChatPrompt('2019 Maruti Swift VXi petrol 40000 km in Mumbai')">💡 2019 Swift VXi in Mumbai</button>
+                    <button class="chip" onclick="fillChatPrompt('2020 Honda City VX CVT petrol 30000 km in Bangalore')">💡 2020 Honda City in Bangalore</button>
+                </div>
+
+                <form id="chat-form" class="chat-input-box">
+                    <input type="text" id="chat-input" placeholder="Type vehicle details (e.g. 2020 Creta SX Diesel 25k km in Delhi)..." required>
+                    <button type="submit" class="btn-chat-send">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
                 </form>
             </div>
         </section>
 
-        <!-- TAB 3: CONDITION SCORER -->
-        <section id="vision-tab" class="tab-content">
-            <div class="glass-card">
-                <div class="card-header">
-                    <h2><i class="fa-solid fa-camera-retro text-amber"></i> PyTorch Computer Vision Condition Assessment</h2>
-                    <p>Upload a vehicle exterior photo to evaluate scratches, dents, and body condition using our fine-tuned MobileNetV3 CNN</p>
+        <!-- TAB 3: CNN CONDITION SCORER -->
+        <section id="vision-tab" class="tab-pane">
+            <div class="glass-panel vision-panel">
+                <div class="panel-head">
+                    <div class="head-title">
+                        <i class="fa-solid fa-camera-retro head-icon icon-purple"></i>
+                        <div>
+                            <h2>PyTorch Computer Vision Damage Assessment</h2>
+                            <p>Upload vehicle exterior photos for MobileNetV3 CNN scratch and defect classification</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="upload-zone" id="drop-zone">
-                    <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
-                    <p>Drag & Drop car photo here or <b>browse file</b></p>
+
+                <div class="upload-dropzone" id="drop-zone">
+                    <div class="drop-icon-bg"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                    <h3>Drag & Drop Vehicle Photo Here</h3>
+                    <p>Supports JPG, PNG, WEBP (Max 10MB)</p>
+                    <button class="btn-browse">Browse Files</button>
                     <input type="file" id="image-upload" accept="image/*" class="hidden-input">
                 </div>
-                <div id="image-result" class="hidden result-box">
-                    <div class="grid-2col align-center">
-                        <img id="uploaded-preview" class="preview-img" src="" alt="Vehicle preview">
-                        <div class="vision-metrics">
-                            <span class="badge-tier" id="tier-badge">Tier 0: Pristine</span>
-                            <h2 id="condition-score-val">Visual Score: 0.95 / 1.00</h2>
-                            <p id="condition-label-text">Vehicle appears in pristine, clean condition with no major visible body defects.</p>
+
+                <div id="image-result" class="hidden vision-results">
+                    <div class="vision-grid">
+                        <img id="uploaded-preview" class="vision-img-preview" src="" alt="Vehicle Preview">
+                        <div class="vision-diagnostics">
+                            <span id="tier-badge" class="badge-tier">Tier 0: Pristine Condition</span>
+                            <h2 id="condition-score-val" class="score-title">Visual Score: 0.95 / 1.00</h2>
+                            <p id="condition-label-text" class="score-desc">Vehicle bodywork shows pristine showroom finish with zero detected denting or deep paint scratches.</p>
                         </div>
                     </div>
                 </div>
@@ -228,17 +427,29 @@
         </section>
 
         <!-- TAB 4: PRICE TREND ANALYTICS -->
-        <section id="trend-tab" class="tab-content">
-            <div class="glass-card">
-                <div class="card-header">
-                    <h2><i class="fa-solid fa-arrow-trend-up text-indigo"></i> LSTM Market Price Trend Forecasting</h2>
-                    <p>Predict future resale price trajectory over 3 months using time-series analysis + macroeconomic signals (fuel prices, interest rates, festive seasonality)</p>
+        <section id="trend-tab" class="tab-pane">
+            <div class="glass-panel trend-panel">
+                <div class="panel-head">
+                    <div class="head-title">
+                        <i class="fa-solid fa-arrow-trend-up head-icon icon-emerald"></i>
+                        <div>
+                            <h2>LSTM Time-Series Price Trend Forecaster</h2>
+                            <p>Predicts 3-month future price trajectories enriched with macroeconomic fuel & interest rate signals</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="filter-row">
-                    <input type="text" id="trend-variant-input" value="Maruti Swift" placeholder="Enter variant (e.g. Maruti Swift, Hyundai Creta)">
-                    <button id="fetch-trend-btn" class="btn-primary"><i class="fa-solid fa-chart-line"></i> Generate Forecast</button>
+
+                <div class="trend-controls">
+                    <div class="input-wrapper flex-1">
+                        <i class="fa-solid fa-magnifying-glass input-icon"></i>
+                        <input type="text" id="trend-variant-input" value="Maruti Swift" placeholder="Enter variant (e.g. Maruti Swift, Hyundai Creta)">
+                    </div>
+                    <button id="fetch-trend-btn" class="btn-hero-primary">
+                        <i class="fa-solid fa-chart-line"></i> Generate Forecast
+                    </button>
                 </div>
-                <div class="chart-container">
+
+                <div class="chart-wrapper">
                     <canvas id="trendChart"></canvas>
                 </div>
             </div>
@@ -246,8 +457,10 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
-        <p>© 2026 AutoValuate AI System — Powered by Stacked ML Ensemble, PyTorch MobileNetV3 CNN & LSTM Time-Series Engine</p>
+    <footer class="app-footer">
+        <div class="footer-content">
+            <p>© 2026 AutoValuate AI Enterprise Platform — Powered by Stacked ML Ensemble, PyTorch MobileNetV3 & LSTM Forecaster</p>
+        </div>
     </footer>
 
     <script src="/static/app.js"></script>
