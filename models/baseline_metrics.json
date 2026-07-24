@@ -1,0 +1,8 @@
+{
+    "model_type": "CatBoostRegressor",
+    "rmse": 1109255.58,
+    "mae": 300980.97,
+    "r2_score": 0.9983,
+    "test_samples": 4521,
+    "trained_at": "2026-07-24T17:29:50.247079"
+}

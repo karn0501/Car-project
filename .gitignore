@@ -1,0 +1,26 @@
+# Python & Byte-code
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment & Virtualenvs
+.venv/
+env/
+venv/
+ENV/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs & Temporary Files
+*.log
+catboost_info/
+scratch/
+.system_generated/
+
+# Large Model Binary Cache (Optional, untrack if oversized)
+# models/*.cbm
+# models/*.joblib
