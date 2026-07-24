@@ -1,0 +1,9 @@
+{
+  "car-prediction-api-key-2026": {
+    "total_requests": 3,
+    "tier": "FREE",
+    "owner": "Public Demo",
+    "minute_window": 29748507,
+    "minute_requests": 1
+  }
+}

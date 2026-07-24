@@ -19,5 +19,12 @@
     "password_hash": "3167838a622898386893a8449059e86b196c3bb414cfa69e586a8d0ce637b847",
     "created_at": "2026-07-24T21:47:19.139089",
     "valuations": []
+  },
+  "testuser_54570f0b@example.com": {
+    "email": "testuser_54570f0b@example.com",
+    "full_name": "Test User",
+    "password_hash": "3167838a622898386893a8449059e86b196c3bb414cfa69e586a8d0ce637b847",
+    "created_at": "2026-07-24T21:57:17.363461",
+    "valuations": []
   }
 }

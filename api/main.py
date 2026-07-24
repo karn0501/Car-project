@@ -137,6 +137,50 @@ prediction_cache = {}
 
 # ─── Endpoints ────────────────────────────────────────────────────────────────
 
+from api.metering import APIMeteringManager
+from src.drift_detector import ModelDriftDetector
+
+metering_manager = APIMeteringManager()
+drift_detector = ModelDriftDetector()
+
+
+@app.get("/metrics", tags=["Enterprise Monitoring"])
+async def get_prometheus_metrics():
+    """Prometheus-compatible system metrics endpoint."""
+    total_preds = len(prediction_cache)
+    return Response(
+        content=f"# HELP car_predictions_total Total predictions generated\n"
+                f"# TYPE car_predictions_total counter\n"
+                f"car_predictions_total {total_preds}\n"
+                f"# HELP car_api_status System operational status\n"
+                f"# TYPE car_api_status gauge\n"
+                f"car_api_status 1\n",
+        media_type="text/plain"
+    )
+
+
+@app.get("/api/usage", tags=["B2B Metering"])
+async def get_api_usage(request: Request):
+    """Query current B2B API key request metrics & quota remaining."""
+    api_key = request.headers.get("X-API-Key", "car-prediction-api-key-2026")
+    metrics = metering_manager.get_key_metrics(api_key)
+    if not metrics:
+        raise HTTPException(status_code=404, detail="API key metrics not found")
+    return metrics
+
+
+@app.post("/drift/check", tags=["Enterprise Monitoring"])
+async def check_data_drift():
+    """Triggers statistical data drift analysis against baseline dataset."""
+    try:
+        from db.data_exporter import load_dataset_from_db
+        live_df = load_dataset_from_db()
+        report = drift_detector.evaluate_dataset_health(live_df)
+        return report
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Drift check failed: {str(e)}")
+
+
 @app.get("/", tags=["UI Dashboard"])
 async def root_index():
     """Serves the interactive web application dashboard."""

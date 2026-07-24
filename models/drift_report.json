@@ -1,0 +1,41 @@
+{
+  "overall_status": "HEALTHY",
+  "drifted_feature_count": 0,
+  "checked_feature_count": 4,
+  "recommendation": "Model predictions remain calibrated",
+  "feature_details": [
+    {
+      "feature": "manufacture_year",
+      "ks_statistic": 0.0,
+      "p_value": 1.0,
+      "psi_score": 0.0,
+      "is_drifted": false,
+      "drift_severity": "LOW"
+    },
+    {
+      "feature": "km_driven",
+      "ks_statistic": 0.0,
+      "p_value": 1.0,
+      "psi_score": 0.0,
+      "is_drifted": false,
+      "drift_severity": "LOW"
+    },
+    {
+      "feature": "engine_cc",
+      "ks_statistic": 0.0,
+      "p_value": 1.0,
+      "psi_score": 0.0,
+      "is_drifted": false,
+      "drift_severity": "LOW"
+    },
+    {
+      "feature": "asking_price",
+      "ks_statistic": 0.0,
+      "p_value": 1.0,
+      "psi_score": 0.0,
+      "is_drifted": false,
+      "drift_severity": "LOW"
+    }
+  ],
+  "timestamp": "2026-07-24T21:57:17.276173"
+}
