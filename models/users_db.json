@@ -1,0 +1,23 @@
+{
+  "testuser_00945032@example.com": {
+    "email": "testuser_00945032@example.com",
+    "full_name": "Test User",
+    "password_hash": "3167838a622898386893a8449059e86b196c3bb414cfa69e586a8d0ce637b847",
+    "created_at": "2026-07-24T21:44:36.997188",
+    "valuations": []
+  },
+  "testuser_b67fe8e7@example.com": {
+    "email": "testuser_b67fe8e7@example.com",
+    "full_name": "Test User",
+    "password_hash": "3167838a622898386893a8449059e86b196c3bb414cfa69e586a8d0ce637b847",
+    "created_at": "2026-07-24T21:45:09.404952",
+    "valuations": []
+  },
+  "testuser_04a112d9@example.com": {
+    "email": "testuser_04a112d9@example.com",
+    "full_name": "Test User",
+    "password_hash": "3167838a622898386893a8449059e86b196c3bb414cfa69e586a8d0ce637b847",
+    "created_at": "2026-07-24T21:47:19.139089",
+    "valuations": []
+  }
+}

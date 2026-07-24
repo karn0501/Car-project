@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoValuate AI — Next-Gen Used Car Price Intelligence Platform</title>
+    <meta name="description" content="AI/ML powered used car price prediction platform with SHAP explainability, PyTorch MobileNet CNN condition scoring, and LSTM price trend forecasting.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="brand">
+                <i class="fa-solid fa-car-side brand-icon"></i>
+                <span class="brand-name">AutoValuate <span class="badge-ai">AI PRO</span></span>
+            </div>
+            <div class="nav-tabs">
+                <button class="tab-btn active" data-tab="valuation-tab"><i class="fa-solid fa-calculator"></i> Valuation</button>
+                <button class="tab-btn" data-tab="chatbot-tab"><i class="fa-solid fa-robot"></i> AI Chat Assistant</button>
+                <button class="tab-btn" data-tab="vision-tab"><i class="fa-solid fa-camera"></i> Condition Scorer</button>
+                <button class="tab-btn" data-tab="trend-tab"><i class="fa-solid fa-chart-line"></i> Price Trends</button>
+            </div>
+            <div class="nav-actions">
+                <span id="api-status-badge" class="status-badge"><i class="fa-solid fa-circle-check"></i> API Online</span>
+                <button id="auth-modal-btn" class="btn-secondary"><i class="fa-solid fa-user"></i> Account</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="main-wrapper">
+        <!-- TAB 1: VALUATION ENGINE -->
+        <section id="valuation-tab" class="tab-content active">
+            <div class="grid-2col">
+                <!-- Form Card -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-sliders text-cyan"></i> Vehicle Specifications</h2>
+                        <p>Enter details to trigger the Phase 3 Stacked ML Ensemble Engine</p>
+                    </div>
+                    <form id="valuation-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="company_name">Manufacturer</label>
+                                <select id="company_name" name="company_name" required>
+                                    <option value="Maruti">Maruti Suzuki</option>
+                                    <option value="Hyundai">Hyundai</option>
+                                    <option value="Tata">Tata Motors</option>
+                                    <option value="Mahindra">Mahindra</option>
+                                    <option value="Honda">Honda</option>
+                                    <option value="Toyota">Toyota</option>
+                                    <option value="Kia">Kia Motors</option>
+                                    <option value="Volkswagen">Volkswagen</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="model_name">Model Name</label>
+                                <input type="text" id="model_name" name="model_name" value="Swift" required placeholder="e.g. Swift, Creta, City">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="variant_name">Variant Name</label>
+                                <input type="text" id="variant_name" name="variant_name" value="VXi" required placeholder="e.g. VXi, SX, XZ">
+                            </div>
+                            <div class="form-group">
+                                <label for="manufacture_year">Manufacture Year</label>
+                                <input type="number" id="manufacture_year" name="manufacture_year" value="2020" min="1995" max="2026" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="km_driven">KM Driven</label>
+                                <input type="number" id="km_driven" name="km_driven" value="35000" min="0" max="500000" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">Registration City</label>
+                                <select id="city" name="city">
+                                    <option value="Mumbai">Mumbai</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Bangalore">Bangalore</option>
+                                    <option value="Hyderabad">Hyderabad</option>
+                                    <option value="Chennai">Chennai</option>
+                                    <option value="Pune">Pune</option>
+                                    <option value="Ahmedabad">Ahmedabad</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fuel_type">Fuel Type</label>
+                                <select id="fuel_type" name="fuel_type">
+                                    <option value="Petrol">Petrol</option>
+                                    <option value="Diesel">Diesel</option>
+                                    <option value="CNG">CNG</option>
+                                    <option value="Electric">Electric</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="transmission">Transmission</label>
+                                <select id="transmission" name="transmission">
+                                    <option value="Manual">Manual</option>
+                                    <option value="Automatic">Automatic</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Free-Text Description (Optional for NLP Quality Scoring)</label>
+                            <textarea id="description" name="description" rows="2" placeholder="e.g. Single owner, showroom condition, full service history, no scratches..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary w-full"><i class="fa-solid fa-wand-magic-sparkles"></i> Calculate AI Resale Valuation</button>
+                    </form>
+                </div>
+
+                <!-- Results Output Card -->
+                <div class="glass-card result-container">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-chart-pie text-emerald"></i> Prediction Output</h2>
+                        <p>Real-time valuation backed by 22,430+ market listings & SHAP explainability</p>
+                    </div>
+
+                    <div id="valuation-placeholder" class="placeholder-state">
+                        <i class="fa-solid fa-car-tunnel placeholder-icon"></i>
+                        <p>Fill in vehicle specs and click <b>Calculate AI Valuation</b> to generate instant market estimate.</p>
+                    </div>
+
+                    <div id="valuation-output" class="hidden">
+                        <div class="hero-price-card">
+                            <span class="price-label">Estimated Fair Market Resale Value</span>
+                            <h1 id="predicted-price-text" class="price-val">₹6,50,000</h1>
+                            <div class="range-pill">
+                                <span>Confidence Range: <strong id="price-range-text">₹5,72,000 – ₹7,28,000</strong></span>
+                            </div>
+                        </div>
+
+                        <div class="shap-section">
+                            <h3><i class="fa-solid fa-diagram-project"></i> SHAP Feature Impact Breakdown</h3>
+                            <div id="shap-bars-container" class="shap-bars"></div>
+                        </div>
+
+                        <div class="action-buttons-row">
+                            <button id="download-pdf-btn" class="btn-emerald"><i class="fa-solid fa-file-pdf"></i> Download PDF Valuation Report</button>
+                            <button id="find-comparable-btn" class="btn-secondary"><i class="fa-solid fa-layer-group"></i> View Similar Listings</button>
+                        </div>
+
+                        <div id="comparable-listings-box" class="comparable-box hidden">
+                            <h4>Comparable Database Listings</h4>
+                            <div id="comparable-list" class="comp-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: AI CONVERSATIONAL CHATBOT -->
+        <section id="chatbot-tab" class="tab-content">
+            <div class="glass-card chat-wrapper">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-comments text-cyan"></i> AI Conversational Car Valuation Assistant</h2>
+                    <p>Type a sentence like <i>"2021 Hyundai Creta SX Diesel automatic 25000 km in Delhi"</i> for instant parsing & valuation.</p>
+                </div>
+                <div id="chat-messages" class="chat-box">
+                    <div class="message bot-message">
+                        <i class="fa-solid fa-robot message-icon"></i>
+                        <div class="message-bubble">
+                            Hello! I am your AI Used Car Valuation Assistant. Tell me about the car you'd like to value (e.g. <i>"2019 Swift VXi petrol 40,000 km in Mumbai"</i>).
+                        </div>
+                    </div>
+                </div>
+                <form id="chat-form" class="chat-input-row">
+                    <input type="text" id="chat-input" placeholder="Type your vehicle details in plain English..." required>
+                    <button type="submit" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> Send</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 3: CONDITION SCORER -->
+        <section id="vision-tab" class="tab-content">
+            <div class="glass-card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-camera-retro text-amber"></i> PyTorch Computer Vision Condition Assessment</h2>
+                    <p>Upload a vehicle exterior photo to evaluate scratches, dents, and body condition using our fine-tuned MobileNetV3 CNN</p>
+                </div>
+                <div class="upload-zone" id="drop-zone">
+                    <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                    <p>Drag & Drop car photo here or <b>browse file</b></p>
+                    <input type="file" id="image-upload" accept="image/*" class="hidden-input">
+                </div>
+                <div id="image-result" class="hidden result-box">
+                    <div class="grid-2col align-center">
+                        <img id="uploaded-preview" class="preview-img" src="" alt="Vehicle preview">
+                        <div class="vision-metrics">
+                            <span class="badge-tier" id="tier-badge">Tier 0: Pristine</span>
+                            <h2 id="condition-score-val">Visual Score: 0.95 / 1.00</h2>
+                            <p id="condition-label-text">Vehicle appears in pristine, clean condition with no major visible body defects.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: PRICE TREND ANALYTICS -->
+        <section id="trend-tab" class="tab-content">
+            <div class="glass-card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-arrow-trend-up text-indigo"></i> LSTM Market Price Trend Forecasting</h2>
+                    <p>Predict future resale price trajectory over 3 months using time-series analysis + macroeconomic signals (fuel prices, interest rates, festive seasonality)</p>
+                </div>
+                <div class="filter-row">
+                    <input type="text" id="trend-variant-input" value="Maruti Swift" placeholder="Enter variant (e.g. Maruti Swift, Hyundai Creta)">
+                    <button id="fetch-trend-btn" class="btn-primary"><i class="fa-solid fa-chart-line"></i> Generate Forecast</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 AutoValuate AI System — Powered by Stacked ML Ensemble, PyTorch MobileNetV3 CNN & LSTM Time-Series Engine</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

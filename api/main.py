@@ -27,8 +27,9 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, PROJECT_ROOT)
 
 from fastapi import FastAPI, HTTPException, Request, UploadFile, File, Depends, Query
-from fastapi.responses import Response, JSONResponse
+from fastapi.responses import Response, JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from api.schemas import (
     PredictRequest, PredictResponse, FeatureImpact,
@@ -42,6 +43,8 @@ from api.services import (
     TrendService, ComparisonService, FeedbackService,
 )
 from api.report_generator import generate_valuation_report
+from api.auth import router as auth_router
+from api.nlp_query_parser import CarQueryParser
 
 
 # ─── App Configuration ────────────────────────────────────────────────────────
@@ -55,6 +58,16 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+# Include Auth Router
+app.include_router(auth_router)
+
+# Mount Static Files for UI Dashboard
+STATIC_DIR = os.path.join(PROJECT_ROOT, "static")
+if os.path.exists(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+query_parser = CarQueryParser()
 
 # CORS middleware for frontend access
 app.add_middleware(
@@ -123,6 +136,32 @@ prediction_cache = {}
 
 
 # ─── Endpoints ────────────────────────────────────────────────────────────────
+
+@app.get("/", tags=["UI Dashboard"])
+async def root_index():
+    """Serves the interactive web application dashboard."""
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"message": "AutoValuate AI System API Online. Visit /docs for API documentation."}
+
+
+@app.post("/chat-predict", tags=["Conversational AI"])
+async def chat_predict(body: dict):
+    """
+    Accepts natural language text query (e.g. '2021 Hyundai Creta SX Diesel automatic 25000 km in Delhi'),
+    parses entities, and returns instant price prediction.
+    """
+    query_text = body.get("query", "")
+    parsed_attrs = query_parser.parse_query(query_text)
+    prediction_result = prediction_service.predict(parsed_attrs)
+
+    return {
+        "query": query_text,
+        "parsed": parsed_attrs,
+        "prediction": prediction_result
+    }
+
 
 @app.get("/health", response_model=HealthResponse, tags=["System"])
 async def health_check():
