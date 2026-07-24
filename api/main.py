@@ -181,6 +181,68 @@ async def check_data_drift():
         raise HTTPException(status_code=500, detail=f"Drift check failed: {str(e)}")
 
 
+from src.currency_engine import CurrencyConverter
+from src.regional_tax import RegionalTaxCalculator
+from src.i18n import TranslationEngine
+
+currency_converter = CurrencyConverter()
+regional_tax_calculator = RegionalTaxCalculator()
+translation_engine = TranslationEngine()
+
+
+@app.get("/currencies", tags=["Multi-Region Localization"])
+async def get_supported_currencies():
+    """Returns supported currency symbols and translation languages."""
+    return {
+        "currencies": currency_converter.get_supported_currencies(),
+        "languages": translation_engine.get_supported_languages()
+    }
+
+
+@app.post("/predict/localized", tags=["Multi-Region Localization"])
+async def predict_localized(request: PredictRequest,
+                            currency: str = Query(default="INR", description="Target currency (INR, USD, EUR, GBP, AED, JPY)"),
+                            lang: str = Query(default="en", description="Output language (en, hi, es, ar)"),
+                            _=Depends(verify_api_key)):
+    """
+    Predict price localized with target currency, regional RTO tax calculations,
+    and multi-language SHAP explainability translations.
+    """
+    car_data = request.model_dump()
+    raw_res = prediction_service.predict(car_data)
+
+    # 1. Currency Conversion
+    localized_res = currency_converter.localize_prediction_prices(raw_res, currency)
+
+    # 2. Regional RTO Tax Calculation
+    regional_fees = regional_tax_calculator.calculate_regional_fees(
+        city=car_data.get("city", "Mumbai"),
+        base_price=raw_res["predicted_price"],
+        fuel_type=car_data.get("fuel_type", "Petrol"),
+        car_age=datetime.now().year - car_data.get("manufacture_year", 2020)
+    )
+
+    # Convert regional fees to target currency if needed
+    if currency.upper() != "INR":
+        regional_fees["base_vehicle_price"] = currency_converter.convert_from_inr(regional_fees["base_vehicle_price"], currency)
+        regional_fees["estimated_rto_tax"] = currency_converter.convert_from_inr(regional_fees["estimated_rto_tax"], currency)
+        regional_fees["ncr_diesel_penalty"] = currency_converter.convert_from_inr(regional_fees["ncr_diesel_penalty"], currency)
+        regional_fees["transfer_admin_fee"] = currency_converter.convert_from_inr(regional_fees["transfer_admin_fee"], currency)
+        regional_fees["total_regional_cost"] = currency_converter.convert_from_inr(regional_fees["total_regional_cost"], currency)
+        regional_fees["total_buyer_landed_cost"] = currency_converter.convert_from_inr(regional_fees["total_buyer_landed_cost"], currency)
+
+    # 3. Multi-language Translation
+    if lang and lang != "en":
+        localized_res["shap_breakdown"] = translation_engine.translate_shap_breakdown(
+            localized_res["shap_breakdown"], lang
+        )
+
+    localized_res["regional_tax_breakdown"] = regional_fees
+    localized_res["language"] = lang
+
+    return localized_res
+
+
 @app.get("/", tags=["UI Dashboard"])
 async def root_index():
     """Serves the interactive web application dashboard."""

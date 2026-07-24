@@ -45,8 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 description: formData.get("description") || null
             };
 
+            const curr = document.getElementById("currency-select") ? document.getElementById("currency-select").value : "INR";
+            const lang = document.getElementById("lang-select") ? document.getElementById("lang-select").value : "en";
+
             try {
-                const response = await fetch("/predict", {
+                const response = await fetch(`/predict/localized?currency=${curr}&lang=${lang}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)

@@ -26,5 +26,19 @@
     "actual_price": 850000.0,
     "comments": "Sold at slightly below predicted price",
     "submitted_at": "2026-07-24T21:55:29.822800"
+  },
+  {
+    "feedback_id": "FB-1F0D3ED782",
+    "prediction_id": "PRED-8293B449CF4A",
+    "actual_price": 850000.0,
+    "comments": "Sold at slightly below predicted price",
+    "submitted_at": "2026-07-24T22:00:06.424401"
+  },
+  {
+    "feedback_id": "FB-AD13A31B1A",
+    "prediction_id": "PRED-5AA35334C6EC",
+    "actual_price": 850000.0,
+    "comments": "Sold at slightly below predicted price",
+    "submitted_at": "2026-07-24T22:02:44.514459"
   }
 ]

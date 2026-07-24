@@ -126,6 +126,17 @@ body {
     border: 1px solid rgba(0, 230, 118, 0.3);
 }
 
+.nav-select {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 0.4rem 0.7rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
 /* Layout & Grid */
 .main-wrapper {
     max-width: 1350px;
