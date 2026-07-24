@@ -1,18 +1,18 @@
 {
     "catboost": {
-        "iterations": 153,
-        "learning_rate": 0.1374617277165719,
-        "depth": 6
+        "iterations": 180,
+        "learning_rate": 0.1257610205118748,
+        "depth": 5
     },
     "xgboost": {
-        "n_estimators": 114,
-        "learning_rate": 0.1271671612047916,
-        "max_depth": 4
+        "n_estimators": 169,
+        "learning_rate": 0.13418186685030553,
+        "max_depth": 6
     },
     "lightgbm": {
-        "n_estimators": 231,
-        "learning_rate": 0.11099155975563543,
-        "num_leaves": 24,
+        "n_estimators": 240,
+        "learning_rate": 0.12049341484773735,
+        "num_leaves": 20,
         "max_depth": 6
     }
 }

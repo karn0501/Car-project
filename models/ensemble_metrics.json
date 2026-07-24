@@ -1,14 +1,14 @@
 {
-    "catboost_r2": 0.9975,
-    "xgboost_r2": 0.9975,
+    "catboost_r2": 0.998,
+    "xgboost_r2": 0.9979,
     "lightgbm_r2": 0.9983,
-    "ensemble_rmse": 1046137.06,
-    "ensemble_mae": 277020.73,
-    "ensemble_r2": 0.9985,
+    "ensemble_rmse": 974177.73,
+    "ensemble_mae": 253270.33,
+    "ensemble_r2": 0.9987,
     "test_samples": 4521,
     "meta_model_weights": [
-        0.3334,
-        0.2442,
-        0.4249
+        0.3021,
+        0.2267,
+        0.4732
     ]
 }

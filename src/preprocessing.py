@@ -31,7 +31,8 @@ NUMERICAL_FEATURES = [
     "car_age",
     "price_per_km",
     "depreciation_ratio",
-    "is_discontinued"
+    "is_discontinued",
+    "visual_condition_score"
 ]
 
 
@@ -48,6 +49,12 @@ class DataPreprocessor:
         Creates domain-specific engineered features.
         """
         df_proc = df.copy()
+
+        # 0. Visual Condition Score (default 1.0 if not provided)
+        if "visual_condition_score" not in df_proc.columns:
+            df_proc["visual_condition_score"] = 1.0
+        else:
+            df_proc["visual_condition_score"] = df_proc["visual_condition_score"].fillna(1.0)
 
         # 1. Car Age in years
         df_proc["car_age"] = np.maximum(0, self.current_year - df_proc["manufacture_year"])
@@ -73,9 +80,12 @@ class DataPreprocessor:
                 df_proc[col] = df_proc[col].fillna("Unknown").astype(str)
 
         # Fill missing numerical values with medians/defaults
-        df_proc["engine_cc"] = df_proc["engine_cc"].fillna(1197)
-        df_proc["seating_capacity"] = df_proc["seating_capacity"].fillna(5)
-        df_proc["ex_showroom_price"] = df_proc["ex_showroom_price"].fillna(800000)
+        if "engine_cc" in df_proc.columns:
+            df_proc["engine_cc"] = df_proc["engine_cc"].fillna(1197)
+        if "seating_capacity" in df_proc.columns:
+            df_proc["seating_capacity"] = df_proc["seating_capacity"].fillna(5)
+        if "ex_showroom_price" in df_proc.columns:
+            df_proc["ex_showroom_price"] = df_proc["ex_showroom_price"].fillna(800000)
 
         return df_proc
 
